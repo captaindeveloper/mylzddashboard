@@ -1,0 +1,60 @@
+query 1
+select unit_price,name,sku,shipping_type from ims_sales_order_item 
+where id_sales_order_item= 229884
+
+query 2
+select id_sales_order_item, name, SKU, s.status from
+ims_sales_order_item i 
+inner join ims_sales_order_item_status s on i.fk_sales_order_item_status=s.id_sales_order_item_status
+where shipping_type='warehouse' and s.status='delivered'
+
+query 3
+select sum(unit_price) as total_price from ims_sales_order_item
+where shipping_type= 'cross_docking'
+
+query 4
+select i.id_sales_order_item,i.name,i.sku from (SELECT distinct sh.fk_sales_order_item FROM lazada.ims_sales_order_item_status_history sh
+where date(sh.created_at)=date('2013-11-06') and sh.fk_sales_order_item_status=53) shist
+left join ims_sales_order_item i
+on shist.fk_sales_order_item=i.id_sales_order_item
+
+query5
+select
+count(*) as Total_Count
+ from ims_sales_order_item i
+ inner join 
+ ims_sales_order_item_status_history sh
+ on sh.fk_sales_order_item=i.id_sales_order_item
+  and sh.fk_sales_order_item_status=53
+ and date(sh.created_at)=date('2013-11-06')
+where i.shipping_type in ('marketplace','cross_docking','warehouse')
+and i.unit_price between 50 and 100
+
+query6
+select 
+fk_sales_order, id_sales_order_item, name, SKU,s.status from
+(
+select t2.fk_sales_order_item,max(sh2.fk_sales_order_item_status) as statusID from 
+(
+select
+t1.fk_sales_order_item,max(sh.created_at) as maxCreated FROM 
+(
+SELECT  fk_sales_order_item,MAX(created_at) as maxCreated FROM ims_sales_order_item_status_history
+group by fk_sales_order_item) t1
+inner join
+ims_sales_order_item_status_history sh
+on sh.fk_sales_order_item=t1.fk_sales_order_item
+and sh.created_at<t1.maxCreated
+group by 1
+) t2
+left join
+ims_sales_order_item_status_history sh2
+on sh2.fk_sales_order_item=t2.fk_sales_order_item
+and sh2.created_at=t2.maxCreated
+group by 1 
+) finalHist
+left join
+ims_sales_order_item i
+on finalHist.fk_sales_order_item=i.id_sales_order_item
+left join ims_sales_order_item_status s
+on finalHist.statusID=s.id_sales_order_item_status

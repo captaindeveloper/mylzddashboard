@@ -38,21 +38,14 @@ return $result;
 }
 function getData($date)
 {
-	if($date)
+	if($date!=''&&$this->validateDate($date))
 	{
-	$sql = "select * from ims_sales_order_item
-where date(updated_at)=?";
-	$stmt=$this->conn->prepare($sql);
-	$stmt->bind_param('s', $date);
+	$sql="select * from ims_sales_order_item where date(updated_at)='$date'";
 	}
-	else 
-	{
-	$sql = "select * from ims_sales_order_item";
-	$stmt=$this->conn->prepare($sql);
-	}
+	else
+	$sql="select * from ims_sales_order_item";
 	
-$stmt->execute();
-$result=$stmt->get_result();
+$result = $this->conn->query($sql);
 return $result;
 }
 function getQuery6()
@@ -86,5 +79,11 @@ left join ims_sales_order_item_status s
 on finalHist.statusID=s.id_sales_order_item_status";
 $result = $this->conn->query($sql);
 return $result;
+}
+function validateDate($date, $format = 'Y-m-d')
+{
+    $d = DateTime::createFromFormat($format, $date);
+    // The Y ( 4 digits year ) returns TRUE for any integer with any number of digits so changing the comparison from == to === fixes the issue.
+    return $d && $d->format($format) === $date;
 }
 }

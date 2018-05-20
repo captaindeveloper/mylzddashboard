@@ -3,7 +3,7 @@
         	?>
 <html>
     <head>
-        <title>Last 10 Results</title>
+        <title>My Dashboard</title>
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 
 <!-- jQuery library -->
@@ -13,8 +13,7 @@
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
    <script>
 function getAllData(str) {
-	alert(str);
-    
+	
         if (window.XMLHttpRequest) {
             // code for IE7+, Firefox, Chrome, Opera, Safari
             xmlhttp = new XMLHttpRequest();
@@ -24,9 +23,10 @@ function getAllData(str) {
         }
         xmlhttp.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
-                alert(this.responseText);
+               
                 document.getElementById("tableAllData").innerHTML = this.responseText;
             }
+            
         };
         xmlhttp.open("GET","getalldata.php?q="+str,true);
         xmlhttp.send();
